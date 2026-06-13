@@ -1041,6 +1041,9 @@
   <data name="menuAddTuicServer" xml:space="preserve">
     <value>Add [TUIC]</value>
   </data>
+  <data name="menuAddTrustTunnelServer" xml:space="preserve">
+    <value>Add [TrustTunnel]</value>
+  </data>
   <data name="TbHeaderType8" xml:space="preserve">
     <value>Congestion control</value>
   </data>

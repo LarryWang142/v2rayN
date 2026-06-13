@@ -273,6 +273,7 @@ public static class ConfigHandler
             EConfigType.WireGuard => await AddWireguardServer(config, item),
             EConfigType.Anytls => await AddAnytlsServer(config, item),
             EConfigType.Naive => await AddNaiveServer(config, item),
+            EConfigType.TrustTunnel => await AddTrustTunnelServer(config, item),
             _ => -1,
         };
         return ret;
@@ -878,6 +879,40 @@ public static class ConfigHandler
         if (profileItem.StreamSecurity.IsNullOrEmpty())
         {
             profileItem.StreamSecurity = Global.StreamSecurity;
+        }
+        if (profileItem.Password.IsNullOrEmpty())
+        {
+            return -1;
+        }
+        await AddServerCommon(config, profileItem, toFile);
+        return 0;
+    }
+
+    /// <summary>
+    /// Add or edit a TrustTunnel server
+    /// Validates and processes TrustTunnel-specific settings
+    /// </summary>
+    /// <param name="config">Current configuration</param>
+    /// <param name="profileItem">TrustTunnel profile to add</param>
+    /// <param name="toFile">Whether to save to file</param>
+    /// <returns>0 if successful, -1 if failed</returns>
+    public static async Task<int> AddTrustTunnelServer(Config config, ProfileItem profileItem, bool toFile = true)
+    {
+        profileItem.ConfigType = EConfigType.TrustTunnel;
+        profileItem.CoreType = ECoreType.sing_box;
+
+        profileItem.Address = profileItem.Address.TrimEx();
+        profileItem.Username = profileItem.Username.TrimEx();
+        profileItem.Password = profileItem.Password.TrimEx();
+        profileItem.Alpn = profileItem.Alpn.TrimEx();
+        profileItem.Network = string.Empty;
+        if (profileItem.StreamSecurity.IsNullOrEmpty())
+        {
+            profileItem.StreamSecurity = Global.StreamSecurity;
+        }
+        if (profileItem.Alpn.IsNullOrEmpty())
+        {
+            profileItem.Alpn = profileItem.GetProtocolExtra().NaiveQuic == true ? "h3" : "h2";
         }
         if (profileItem.Password.IsNullOrEmpty())
         {
@@ -1579,6 +1614,7 @@ public static class ConfigHandler
                 EConfigType.WireGuard => await AddWireguardServer(config, profileItem, false),
                 EConfigType.Anytls => await AddAnytlsServer(config, profileItem, false),
                 EConfigType.Naive => await AddNaiveServer(config, profileItem, false),
+                EConfigType.TrustTunnel => await AddTrustTunnelServer(config, profileItem, false),
                 _ => -1,
             };
 
@@ -1776,6 +1812,7 @@ public static class ConfigHandler
                     EConfigType.WireGuard => await AddWireguardServer(config, profileItem, false),
                     EConfigType.Anytls => await AddAnytlsServer(config, profileItem, false),
                     EConfigType.Naive => await AddNaiveServer(config, profileItem, false),
+                    EConfigType.TrustTunnel => await AddTrustTunnelServer(config, profileItem, false),
                     EConfigType.PolicyGroup or EConfigType.ProxyChain => await AddServerCommon(config, profileItem, false),
                     _ => -1,
                 };

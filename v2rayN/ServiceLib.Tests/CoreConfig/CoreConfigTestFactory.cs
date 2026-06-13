@@ -130,6 +130,27 @@ internal static class CoreConfigTestFactory
         };
     }
 
+    public static ProfileItem CreateTrustTunnelNode(ECoreType coreType, string indexId = "node-trusttunnel-1",
+        string remarks = "demo-trusttunnel")
+    {
+        return new ProfileItem
+        {
+            IndexId = indexId,
+            ConfigType = EConfigType.TrustTunnel,
+            CoreType = coreType,
+            Remarks = remarks,
+            Address = "tt.example.com",
+            Port = 443,
+            Password = "pass",
+            Username = "user",
+            Network = string.Empty,
+            StreamSecurity = Global.StreamSecurity,
+            Sni = "tt.example.com",
+            Alpn = "h2",
+            Subid = string.Empty,
+        };
+    }
+
     public static ProfileItem CreatePolicyGroupNode(ECoreType coreType, string indexId, string remarks,
         IEnumerable<string> childIndexIds)
     {

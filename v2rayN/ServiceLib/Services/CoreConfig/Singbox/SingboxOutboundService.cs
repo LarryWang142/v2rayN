@@ -294,6 +294,17 @@ public partial class CoreConfigSingboxService
                         outbound.udp_over_tcp = protocolExtra.Uot == true ? true : null;
                         break;
                     }
+                case EConfigType.TrustTunnel:
+                    {
+                        outbound.username = _node.Username;
+                        outbound.password = _node.Password;
+                        if (protocolExtra.NaiveQuic == true)
+                        {
+                            outbound.quic = true;
+                            outbound.quic_congestion_control = protocolExtra.CongestionControl.NullIfEmpty();
+                        }
+                        break;
+                    }
             }
 
             FillOutboundTls(outbound);

@@ -1038,6 +1038,9 @@
   <data name="menuAddTuicServer" xml:space="preserve">
     <value>添加 [TUIC]</value>
   </data>
+  <data name="menuAddTrustTunnelServer" xml:space="preserve">
+    <value>添加 [TrustTunnel]</value>
+  </data>
   <data name="TbHeaderType8" xml:space="preserve">
     <value>拥塞控制算法</value>
   </data>

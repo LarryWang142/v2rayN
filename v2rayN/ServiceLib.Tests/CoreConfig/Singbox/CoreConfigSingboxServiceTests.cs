@@ -30,6 +30,60 @@ public class CoreConfigSingboxServiceTests
     }
 
     [Fact]
+    public void GenerateClientConfigContent_TrustTunnel_ShouldGenerateTlsOutbound()
+    {
+        var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);
+        CoreConfigTestFactory.BindAppManagerConfig(config);
+        var node = CoreConfigTestFactory.CreateTrustTunnelNode(ECoreType.sing_box);
+        var context = CoreConfigTestFactory.CreateContext(config, node, ECoreType.sing_box);
+
+        var result = new CoreConfigSingboxService(context).GenerateClientConfigContent();
+
+        result.Success.Should().BeTrue($"ret msg: {result.Msg}");
+        var singboxConfig = JsonUtils.Deserialize<SingboxConfig>(result.Data!.ToString())!;
+        var outbound = singboxConfig.outbounds.First(o => o.tag == Global.ProxyTag);
+
+        outbound.type.Should().Be("trusttunnel");
+        outbound.server.Should().Be("tt.example.com");
+        outbound.server_port.Should().Be(443);
+        outbound.username.Should().Be("user");
+        outbound.password.Should().Be("pass");
+        outbound.quic.Should().BeNull();
+        outbound.quic_congestion_control.Should().BeNull();
+        outbound.tls.Should().NotBeNull();
+        outbound.tls!.enabled.Should().BeTrue();
+        outbound.tls.server_name.Should().Be("tt.example.com");
+        outbound.tls.alpn.Should().BeEquivalentTo(["h2"]);
+    }
+
+    [Fact]
+    public void GenerateClientConfigContent_TrustTunnelQuic_ShouldGenerateQuicOptions()
+    {
+        var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);
+        CoreConfigTestFactory.BindAppManagerConfig(config);
+        var node = CoreConfigTestFactory.CreateTrustTunnelNode(ECoreType.sing_box);
+        node.Alpn = "h3";
+        node.SetProtocolExtra(node.GetProtocolExtra() with
+        {
+            NaiveQuic = true,
+            CongestionControl = "bbr",
+        });
+        var context = CoreConfigTestFactory.CreateContext(config, node, ECoreType.sing_box);
+
+        var result = new CoreConfigSingboxService(context).GenerateClientConfigContent();
+
+        result.Success.Should().BeTrue($"ret msg: {result.Msg}");
+        var singboxConfig = JsonUtils.Deserialize<SingboxConfig>(result.Data!.ToString())!;
+        var outbound = singboxConfig.outbounds.First(o => o.tag == Global.ProxyTag);
+
+        outbound.type.Should().Be("trusttunnel");
+        outbound.quic.Should().BeTrue();
+        outbound.quic_congestion_control.Should().Be("bbr");
+        outbound.tls.Should().NotBeNull();
+        outbound.tls!.alpn.Should().BeEquivalentTo(["h3"]);
+    }
+
+    [Fact]
     public void GenerateClientConfigContent_TunWithLoopbackPreSocks_ShouldKeepMixedInbound()
     {
         var config = CoreConfigTestFactory.CreateConfig(ECoreType.sing_box);

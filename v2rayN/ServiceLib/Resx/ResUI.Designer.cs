@@ -752,6 +752,15 @@ namespace ServiceLib.Resx {
                 return ResourceManager.GetString("menuAddNaiveServer", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   查找类似 Add [TrustTunnel] 的本地化字符串。
+        /// </summary>
+        public static string menuAddTrustTunnelServer {
+            get {
+                return ResourceManager.GetString("menuAddTrustTunnelServer", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   查找类似 Add Policy Group 的本地化字符串。
